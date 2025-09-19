@@ -10,12 +10,16 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class UserController extends Controller
 {
     public function index(): View
     {
+        $user = Auth::user();
+
         $users = User::query()
             ->select([
                 'user_id',
@@ -24,6 +28,7 @@ class UserController extends Controller
                 'role',
                 'shift'
             ])
+            ->where('user_id', '!=' , $user->user_id)
             ->get();
 
         return view('user.index', compact('users'));
@@ -92,8 +97,14 @@ class UserController extends Controller
         return view('user.password', compact(['user', 'validator']));
     }
 
-    public function updatePassword(UserPassworRequest $request, User $user)
+    public function updatePassword(UserPassworRequest $request, User $user): RedirectResponse
     {
+        $password = Hash::make($request->validated()['password']);
 
+        if ($user->update(['password' => $password])) {
+            return to_route('user.index')->with('success','Password updated successfully.');
+        }
+
+        return to_route('user.index')->with('error','Failed to update user password.');
     }
 }
