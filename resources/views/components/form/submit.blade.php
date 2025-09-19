@@ -1,7 +1,7 @@
 @props([
     'id' => '',
     'class' => '',
-    'label' => ''
+    'label' => '',
 ])
 
 <button 

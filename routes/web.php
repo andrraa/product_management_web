@@ -21,4 +21,8 @@ Route::middleware('auth')->group(function() {
     Route::resource('product', ProductController::class)->except('show');
 
     Route::resource('user', UserController::class);
+    Route::controller(UserController::class)->group(function() {
+        Route::get('user/password/{user}/edit', 'editPassword')->name('user.edit.password');
+        Route::put('user/password/{user}', 'updatePassword')->name('user.update.password');
+    });
 });

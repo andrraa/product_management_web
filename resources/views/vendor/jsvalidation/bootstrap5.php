@@ -7,7 +7,13 @@
                 errorClass: 'invalid-feedback',
 
                 errorPlacement: function (error, element) {
-                    error.insertAfter(element);
+                    if (element.closest('.shiftParent').length) {
+                        error.insertAfter(element.closest('.shiftParent'));
+                    } else if (element.closest('.roleParent').length) {
+                        error.insertAfter(element.closest('.roleParent'));
+                    } else {
+                        error.insertAfter(element);
+                    }
                 },
                 highlight: function (element) {
                     $(element).removeClass('is-valid').addClass('is-invalid'); // add the Bootstrap error class to the control group

@@ -17,16 +17,29 @@
     <div class="flex h-dvh w-full">
         @include('partials.sidebar')
 
-        <div class="flex flex-col flex-1">
+        <div class="flex flex-col w-full">
             @include('partials.navbar')
 
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex flex-col overflow-y-auto md:p-8 p-4">
+                @include('partials.alert')
+                
                 @yield('content')
             </main>
         </div>
     </div>
 
     @vite(['resources/js/app.js', 'resources/js/theme.js'])
+
+    <script type="module">
+        $(document).ready(function () {
+            // CSRF Token
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+        });
+    </script>
 
     @stack('scripts')
 </body>
