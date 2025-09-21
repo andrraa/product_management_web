@@ -9,6 +9,8 @@
 
         <x-sidebar-item route="{{ route('product.index') }}" pattern="product.*" icon="fa-server" label="Product" />
 
+        <x-sidebar-item route="{{ route('history') }}" pattern="history" icon="fa-dollar" label="History" />
+
         @if ($authUser->role === \App\Models\User::ROLE_ADMIN)
             <x-sidebar-item route="{{ route('user.index') }}" pattern="user.*" icon="fa-user" label="User" />
         @endif

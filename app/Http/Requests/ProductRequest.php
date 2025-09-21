@@ -33,4 +33,11 @@ class ProductRequest extends FormRequest
             ]
         ];
     }
+
+    public function prepareForValidation(): void
+    {
+        $this->merge([
+            'name' => ucwords(strtolower($this->name))
+        ]);
+    }
 }
