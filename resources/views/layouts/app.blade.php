@@ -17,10 +17,10 @@
     <div class="flex h-dvh w-full">
         @include('partials.sidebar')
 
-        <div class="flex flex-col w-full">
+        <div class="flex flex-col w-full overflow-y-auto">
             @include('partials.navbar')
 
-            <main class="flex flex-col overflow-y-auto md:p-8 p-4">
+            <main class="flex flex-col md:p-8 p-4">
                 @include('partials.alert')
                 
                 @yield('content')

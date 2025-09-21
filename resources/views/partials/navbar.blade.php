@@ -1,4 +1,4 @@
-<nav class="h-16 flex items-center justify-between px-4 bg-white dark:bg-gray-700 transition-colors duration-300 border-b border-b-gray-300 dark:border-b-gray-900">
+<nav class="h-16 flex items-center justify-between px-4 bg-white dark:bg-gray-700 transition-colors duration-300 border-b border-b-gray-300 dark:border-b-gray-900 shrink-0">
     <x-theme-toggle variant="small" />
 
     <div class="flex items-center shrink-0 space-x-2">

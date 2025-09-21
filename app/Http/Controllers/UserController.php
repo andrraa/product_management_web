@@ -13,25 +13,43 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
+use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View|JsonResponse
     {
         $user = Auth::user();
 
-        $users = User::query()
-            ->select([
-                'user_id',
-                'name',
-                'username',
-                'role',
-                'shift'
-            ])
-            ->where('user_id', '!=' , $user->user_id)
-            ->get();
+        if ($request->ajax()) {
+            $users = User::query()
+                ->select([
+                    'user_id',
+                    'name',
+                    'username',
+                    'role',
+                    'shift'
+                ]);
 
-        return view('user.index', compact('users'));
+            return DataTables::of($users)
+                ->addIndexColumn()
+                ->escapeColumns()
+                ->addColumn('actions', function($user) {
+                    return [
+                        'edit' => route('user.edit', $user->user_id),
+                        'password' => route('user.edit.password', $user->user_id),
+                        'delete' => route('user.destroy', $user->user_id),
+                    ];
+                })
+                ->toJson();
+        }
+
+        $totals = [
+            'admin'    => User::where('role', User::ROLE_ADMIN)->count(),
+            'employee' => User::where('role', User::ROLE_EMPLOYEE)->count(),
+        ];
+
+        return view('user.index', compact('totals'));
     }
 
     public function create(): View

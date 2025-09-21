@@ -14,3 +14,56 @@
 .invalid-feedback {
     @apply text-sm text-red-500 dark:text-yellow-500 mt-1 block tracking-wide;
 }
+
+/* DataTables */
+.dt-info,
+.dt-length label,
+.dt-search label {
+    @apply text-sm text-gray-500 tracking-wide dark:text-gray-200;
+}
+
+.dt-length select {
+    @apply text-sm px-2 py-1.5 dark:text-gray-200 ring-0 outline-none;
+}
+
+.dt-search input {
+    @apply text-sm px-4 py-1.5 dark:text-gray-200 ring-0 focus:border-green-500 outline-none;
+}
+
+.dt-search {
+  @apply flex justify-end items-center;
+}
+
+.dt-info {
+  @apply flex items-center;
+}
+
+.dt-paging {
+  @apply flex justify-end;
+}
+
+.dt-paging ul {
+  @apply space-x-1;
+}
+
+.dt-paging .pagination a {
+  @apply bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-md text-sm;
+}
+
+.dt-paging .pagination a.current,
+.dt-paging .pagination a[aria-current="page"] {
+  @apply bg-gray-100 text-gray-800 font-semibold dark:bg-gray-700 dark:text-white dark:border-gray-50/50 rounded-md text-sm;
+}
+
+.dt-paging .pagination a[aria-disabled="true"] {
+  @apply bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600 rounded-md text-sm;
+}
+
+table.dataTable thead th {
+  @apply px-4 py-2 bg-gray-100 dark:bg-gray-900 dark:text-gray-200 !text-sm whitespace-nowrap border-b-[1px] border-gray-300 dark:border-gray-700;
+}
+
+table.dataTable tbody td {
+  @apply px-4 py-2 dark:text-gray-200 !text-sm whitespace-nowrap;
+}
+/* DataTables */

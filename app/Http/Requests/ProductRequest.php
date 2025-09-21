@@ -14,7 +14,23 @@ class ProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => [
+                'required',
+                'string'
+            ],
+            'price'=> [
+                'required',
+                'string'
+            ],
+            'stock' => [
+                'required_if:type,food',
+                'integer'
+            ],
+            'type' => [
+                'required',
+                'string',
+                'in:food,billing'
+            ]
         ];
     }
 }

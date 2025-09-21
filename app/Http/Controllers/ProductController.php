@@ -9,12 +9,40 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Yajra\DataTables\DataTables;
 
 class ProductController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View|JsonResponse
     {
-        return view('product.index');
+        if ($request->ajax()) {
+            $products = Product::query()
+                ->select([
+                    'product_id',
+                    'name',
+                    'price',
+                    'stock',
+                    'type'
+                ]);
+
+            return DataTables::of($products)
+                ->addIndexColumn()
+                ->escapeColumns()
+                ->addColumn('actions', function($product) {
+                    return [
+                        'edit' => route('product.edit', $product->product_id),
+                        'delete' => route('product.destroy', $product->product_id),
+                    ];
+                })
+                ->toJson();
+        }
+
+        $totals = [
+            'food'    => Product::where('type', Product::TYPE_FOOD)->count(),
+            'billing' => Product::where('type', Product::TYPE_BILLING)->count(),
+        ];
+        
+        return view('product.index', compact('totals'));
     }
 
     public function create(): View
@@ -39,7 +67,7 @@ class ProductController extends Controller
     {
         $validator = Helper::generateValidator(ProductRequest::class, '#form-product');
 
-        return view('product.edit', compact('validator'));
+        return view('product.edit', compact(['validator', 'product']));
     }
 
     public function update(ProductRequest $request, Product $product): RedirectResponse

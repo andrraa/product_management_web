@@ -2,6 +2,10 @@
 
 @section('title', 'User')
 
+@push('styles')
+    <link href="https://cdn.datatables.net/2.3.4/css/dataTables.tailwindcss.css" rel="stylesheet">
+@endpush
+
 @section('content')
     <div class="grid grid-cols-2 items-center gap-2 mb-4">
         <span class="text-lg font-bold tracking-wide text-green-600 dark:text-gray-200">User</span>
@@ -11,136 +15,133 @@
         </a>
     </div>
 
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <div class="md:h-24 bg-white dark:bg-gray-700 rounded-md flex items-center px-4 gap-4">
+            <div class="md:h-12 md:w-12 bg-green-500 flex items-center justify-center rounded-md">
+                <i class="fa-solid fa-utensils text-white"></i>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-semibold dark:text-gray-200 text-green-500">Total Admin</span>
+                <span class="font-semibold dark:text-gray-200">{{ $totals['admin'] }}</span>
+            </div>
+        </div>
+
+        <div class="md:h-24 bg-white dark:bg-gray-700 rounded-md flex items-center px-4 gap-4">
+            <div class="md:h-12 md:w-12 bg-green-500 flex items-center justify-center rounded-md">
+                <i class="fa-solid fa-computer text-white"></i>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-semibold dark:text-gray-200 text-green-500">Total Employee</span>
+                <span class="font-semibold dark:text-gray-200">{{ $totals['employee'] }}</span>
+            </div>
+        </div>
+    </div>
+
     <div class="bg-white dark:bg-gray-700 p-4 rounded-md overflow-x-auto max-w-full">
-        <table id="table-user" class="min-w-full border-collapse">
-            <thead id="table-user-head" class="text-left">
-                <tr>
-                    <x-table.table-head label="#" />
-
-                    <x-table.table-head label="Name" />
-
-                    <x-table.table-head label="Username" />
-
-                    <x-table.table-head label="Role" />
-
-                    <x-table.table-head label="Shift" />
-
-                    <x-table.table-head label="Actions" />
-                </tr>
-            </thead>
-            <tbody id="table-user-body" class="text-left divide-y divide-gray-200 dark:divide-gray-200/20">
-                @forelse ($users as $index => $user)
+        <div class="bg-white dark:bg-gray-700 p-4 rounded-md overflow-x-auto max-w-full h-full">
+            <table id="table-user" class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                <thead>
                     <tr>
-                        <x-table.table-data :value="$index + 1" />
-
-                        <x-table.table-data :value="$user->name" />
-
-                        <x-table.table-data :value="$user->username" />
-
-                        <x-table.table-data>
-                            @php
-                                $roleClass = '';
-
-                                if ($user->role === \App\Models\User::ROLE_ADMIN) {
-                                    $roleClass = 'text-blue-600 dark:text-blue-300';
-                                } else if ($user->role === \App\Models\User::ROLE_EMPLOYEE) {
-                                    $roleClass = 'text-red-600 dark:text-red-300';
-                                }
-                            @endphp
-
-                            <span 
-                                class="inline-block px-2 py-1 text-xs font-semibold tracking-wider uppercase rounded-lg {{ $roleClass }}">
-                                {{ $user->role }}
-                            </span>
-                        </x-table.table-data>
-
-                        <x-table.table-data>
-                            @php
-                                $shiftClass = '';
-
-                                if ($user->shift === \App\Models\User::SHIFT_MORNING) {
-                                    $shiftClass = 'text-green-600  dark:text-green-300';
-                                } else if ($user->shift === \App\Models\User::SHIFT_NIGHT) {
-                                    $shiftClass = 'text-purple-600 dark:text-purple-300';
-                                }
-                            @endphp
-
-                            <span
-                                class="inline-block px-2 py-1 text-xs font-semibold tracking-wider uppercase rounded-lg {{ $shiftClass }}">
-                                {{ $user->shift ?? '' }}
-                            </span>
-                        </x-table.table-data>
-                        
-                        <x-table.table-data>
-                            <div class="flex items-center space-x-2 shrink-0">
-                                <a href="{{ route('user.edit', $user->user_id) }}" type="button">
-                                    <i class="fa-solid fa-edit text-xs text-green-600 dark:text-green-400"></i>
-                                </a>
-
-                                <a href="{{ route('user.edit.password', $user->user_id) }}" type="button">
-                                    <i class="fa-solid fa-key text-xs text-blue-600 dark:text-blue-400"></i>
-                                </a>
-
-                                <button 
-                                    type="button" class="cursor-pointer button-delete"
-                                    data-url="{{ route('user.destroy', $user->user_id) }}">
-                                    <i class="fa-solid fa-trash text-xs text-red-600 dark:text-red-400"></i>
-                                </button>
-                            </div>
-                        </x-table.table-data>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Type</th>
+                        <th>Actions</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="px-4 py-2 dark:text-gray-200 text-sm whitespace-nowrap">
-                            User data is empty.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+            </table>
+        </div>
     </div>
 @endsection
 
 @push('scripts')
+    <script type="module" src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
+    <script type="module" src="https://cdn.datatables.net/2.3.4/js/dataTables.tailwindcss.js"></script>
+
     <script type="module">
-        $(document).on('click', '.button-delete', function(e) {
-            e.preventDefault();
+        $(document).ready(function() {
+            $('#table-user').DataTable({
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                autoWidth: false,
+                ajax: "{{ route('user.index') }}",
+                order: [[3, 'desc']],
+                columns: [
+                    {
+                        data: 'DT_RowIndex', 
+                        name: 'DT_RowIndex', 
+                        orderable: false, 
+                        searchable: false
+                    },
+                    {
+                        data: 'name', 
+                        name: 'name'
+                    },
+                    {
+                        data: 'username', 
+                        name: 'username'
+                    },
+                    { 
+                        data: 'role', 
+                        name: 'role',
+                        render: function (data, type, row) {
+                            let typeClass = '';
 
-            let button = $(this);
-            let url = button.data('url');
-            let row = button.closest('tr');
+                            if (data === 'admin') {
+                                typeClass = 'text-blue-600 dark:text-blue-300';
+                            } else if (data === 'employee') {
+                                typeClass = 'text-red-600 dark:text-red-300';
+                            }
 
-            Swal.fire({
-                title: "Are you sure?",
-                text: "This user will permanently deleted.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Delete"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: url,
-                        type: "DELETE",
-                        success: function (response) {
-                            Swal.fire({
-                                title: "Deleted",
-                                text: "Data user deleted successfully.",
-                                icon: "success",
-                                timer: 1000,
-                                showConfirmButton: false
-                            });
-
-                            row.fadeOut(300, function () {
-                                $(this).remove();
-                            });
-                        },
-                        error: function (xhr) {
-                            Swal.fire("Failed", "Failed to delete user.", "error");
+                            return `
+                                <span class="inline-block px-2 py-1 text-xs font-bold tracking-wider uppercase rounded-lg ${typeClass}">
+                                    ${data ?? ''}
+                                </span>
+                            `;
                         }
-                    });
-                }
+                    },
+                    { 
+                        data: 'shift', 
+                        name: 'shift',
+                        render: function (data, type, row) {
+                            let typeClass = '';
+
+                            if (data === 'admin') {
+                                typeClass = 'text-green-600 dark:text-green-300';
+                            } else if (data === 'employee') {
+                                typeClass = 'text-purple-600 dark:text-purple-300';
+                            }
+
+                            return `
+                                <span class="inline-block px-2 py-1 text-xs font-bold tracking-wider uppercase rounded-lg ${typeClass}">
+                                    ${data ?? ''}
+                                </span>
+                            `;
+                        }
+                    },
+                    {
+                        data: 'actions',
+                        name: 'actions',
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row) {
+                            return `
+                                <a href="${data.edit}" type="button">
+                                    <i class="fa-solid fa-edit text-xs text-green-600 dark:text-green-400"></i>
+                                </a>
+                                <a href="${data.password}" type="button">
+                                    <i class="fa-solid fa-key text-xs text-blue-600 dark:text-blue-400"></i>
+                                </a>
+                                <button 
+                                    type="button" class="cursor-pointer button-delete" onclick="confirmDelete('${data.delete}', this.closest('tr'))">
+                                    <i class="fa-solid fa-trash text-xs text-red-600 dark:text-red-400"></i>
+                                </button>
+                            `;
+                        }
+                    }
+                ]
             });
         });
     </script>
