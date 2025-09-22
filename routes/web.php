@@ -35,4 +35,5 @@ Route::middleware('auth')->group(function() {
     Route::post('checkout', [CheckoutController::class, 'checkout'])->name('checkout');
 
     Route::get('history', [HistoryController::class, 'index'])->name('history');
+    Route::post('history/pdf', [HistoryController::class, 'export'])->name('history.export');
 });

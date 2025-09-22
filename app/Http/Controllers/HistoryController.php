@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Checkout;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
@@ -24,16 +27,73 @@ class HistoryController extends Controller
                     'price',
                     'type',
                     'total_price',
-                    'fk_user_id'
+                    'fk_user_id',
+                    'created_at'
                 ])
                 ->where('fk_user_id', $user->user_id);
 
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $start = Carbon::parse($request->start_date)->startOfDay();
+                $end   = Carbon::parse($request->end_date)->endOfDay();
+
+                $histories->whereBetween('created_at', [$start, $end]);
+            }
+
+            $baseQuery = clone $histories;
+
+            $qrisTotal   = (clone $baseQuery)->where('payment_method', 'qris')->sum('total_price');
+            $qrisCount   = (clone $baseQuery)->where('payment_method', 'qris')->count();
+
+            $tunaiTotal  = (clone $baseQuery)->where('payment_method', 'tunai')->sum('total_price');
+            $tunaiCount  = (clone $baseQuery)->where('payment_method', 'tunai')->count();
+
             return DataTables::of($histories)
                 ->addIndexColumn()
+                ->with([
+                    'qris_total'  => $qrisTotal,
+                    'qris_count'  => $qrisCount,
+                    'tunai_total' => $tunaiTotal,
+                    'tunai_count' => $tunaiCount,
+                ])
                 ->escapeColumns()
                 ->toJson();
         }
 
         return view('history.index');
+    }
+
+    public function export(Request $request): Response
+    {
+        $user = Auth::user();
+
+        $query = Checkout::query()
+            ->where('fk_user_id', $user->user_id);
+
+        $start = Carbon::parse($request->start_date)->startOfDay();
+        $end   = Carbon::parse($request->end_date)->endOfDay();
+        $query->whereBetween('created_at', [$start, $end]);
+
+        $histories = $query->orderBy('created_at', 'desc')->get();
+
+        $totalQris   = $histories->where('payment_method', 'qris')->sum('total_price');
+        $jumlahQris  = $histories->where('payment_method', 'qris')->count();
+
+        $totalTunai  = $histories->where('payment_method', 'tunai')->sum('total_price');
+        $jumlahTunai = $histories->where('payment_method', 'tunai')->count();
+
+        $grandTotal  = $histories->sum('total_price');
+
+        $pdf = Pdf::loadView('history.pdf', compact(
+            'histories',
+            'totalQris',
+            'jumlahQris',
+            'totalTunai',
+            'jumlahTunai',
+            'grandTotal',
+            'start',
+            'end'
+        ))->setPaper('a4', 'landscape');
+
+        return $pdf->download("report-{$start->format('Y-m-d')}_to_{$end->format('Y-m-d')}.pdf");
     }
 }

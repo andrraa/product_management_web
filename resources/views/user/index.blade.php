@@ -44,9 +44,9 @@
                     <tr>
                         <th>#</th>
                         <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock</th>
-                        <th>Type</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Shift</th>
                         <th>Actions</th>
                     </tr>
                 </thead>

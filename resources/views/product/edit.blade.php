@@ -10,6 +10,7 @@
     <div class="bg-white dark:bg-gray-700 p-4 rounded-md">
         <form id="form-product" action="{{ route('product.update', $product->product_id) }}" method="POST">
             @csrf
+            @method('PUT')
 
             @include('product.form')
 
