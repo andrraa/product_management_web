@@ -3,12 +3,8 @@
 @section('title', 'Overview')
 
 @section('content')
-    <div class="grid grid-cols-2 items-center gap-2 mb-4">
+    <div class="mb-4">
         <span class="text-lg font-bold tracking-wide text-green-600 dark:text-gray-200">Dashboard</span>
-
-        <button type="button" class="px-4 py-2 rounded-md bg-green-500 text-white w-fit ml-auto text-sm hover:bg-green-600 transition-colors duration-300 cursor-pointer">
-            Export Laporan
-        </button>
     </div>
     
     <div class="grid md:grid-cols-3 gap-4 h-[calc(100vh-11.3rem)]"> 

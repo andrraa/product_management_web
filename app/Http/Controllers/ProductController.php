@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Helper\Helper;
 use App\Http\Requests\ProductRequest;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Yajra\DataTables\DataTables;
 
@@ -15,6 +17,8 @@ class ProductController extends Controller
 {
     public function index(Request $request): View|JsonResponse
     {
+        $user = Auth::user();
+
         if ($request->ajax()) {
             $products = Product::query()
                 ->select([
@@ -28,11 +32,15 @@ class ProductController extends Controller
             return DataTables::of($products)
                 ->addIndexColumn()
                 ->escapeColumns()
-                ->addColumn('actions', function($product) {
-                    return [
-                        'edit' => route('product.edit', $product->product_id),
-                        'delete' => route('product.destroy', $product->product_id),
-                    ];
+                ->addColumn('actions', function($product) use ($user) {
+                    $actions = [];
+
+                    if ($user->role === User::ROLE_ADMIN) {
+                        $actions['delete'] = route('product.destroy', $product->product_id);
+                        $actions['edit'] = route('product.edit', $product->product_id);
+                    }
+
+                    return $actions;
                 })
                 ->toJson();
         }
@@ -63,8 +71,14 @@ class ProductController extends Controller
         return to_route('product.index')->with('error', 'Failed to create product!');
     }
 
-    public function edit(Product $product): View
+    public function edit(Product $product): View|RedirectResponse
     {
+        $user = Auth::user();
+
+        if ($user->role !== User::ROLE_ADMIN) {
+            return to_route('product.index');
+        }
+
         $validator = Helper::generateValidator(ProductRequest::class, '#form-product');
 
         return view('product.edit', compact(['validator', 'product']));
@@ -72,6 +86,12 @@ class ProductController extends Controller
 
     public function update(ProductRequest $request, Product $product): RedirectResponse
     {
+        $user = Auth::user();
+
+        if ($user->role !== User::ROLE_ADMIN) {
+            return to_route('product.index');
+        }
+
         $validated = $request->validated();
 
         if ($product->update($validated)) {

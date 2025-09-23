@@ -129,16 +129,27 @@
                         orderable: false,
                         searchable: false,
                         render: function (data, type, row) {
-                            return `
+                        let buttons = '';
+
+                        if (data.edit) {
+                            buttons += `
                                 <a href="${data.edit}" type="button">
                                     <i class="fa-solid fa-edit text-xs text-green-600 dark:text-green-400"></i>
                                 </a>
+                            `;
+                        }
+
+                        if (data.delete) {
+                            buttons += `
                                 <button 
                                     type="button" class="cursor-pointer button-delete" onclick="confirmDelete('${data.delete}', this.closest('tr'))">
                                     <i class="fa-solid fa-trash text-xs text-red-600 dark:text-red-400"></i>
                                 </button>
                             `;
                         }
+
+                        return buttons;
+                    }
                     }
                 ]
             });

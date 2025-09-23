@@ -13,25 +13,25 @@
 
     <div class="mb-4 flex flex-col md:flex-row md:items-end md:space-x-3 space-y-2 md:space-y-0">
         <div>
-            <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                Start Date
+            <label for="start_datetime" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                Start Date & Time
             </label>
-            <input type="date" id="start_date" 
-                class="mt-1 w-full md:w-48 px-2 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 
+            <input type="datetime-local" id="start_datetime" 
+                class="mt-1 w-full md:w-60 px-2 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 
                     bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm
                     focus:outline-none focus:ring focus:ring-green-500 focus:border-green-500"
-                value="{{ date('Y-m-d') }}">
+                value="{{ date('Y-m-d') }}T10:00">
         </div>
 
         <div>
-            <label for="end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                End Date
+            <label for="end_datetime" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                End Date & Time
             </label>
-            <input type="date" id="end_date" 
-                class="mt-1 w-full md:w-48 px-2 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 
+            <input type="datetime-local" id="end_datetime" 
+                class="mt-1 w-full md:w-60 px-2 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 
                     bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm
                     focus:outline-none focus:ring focus:ring-green-500 focus:border-green-500"
-                value="{{ date('Y-m-d') }}">
+                value="{{ date('Y-m-d') }}T22:00">
         </div>
 
         <div>

@@ -33,8 +33,14 @@ class HistoryController extends Controller
                 ->where('fk_user_id', $user->user_id);
 
             if ($request->filled('start_date') && $request->filled('end_date')) {
-                $start = Carbon::parse($request->start_date)->startOfDay();
-                $end   = Carbon::parse($request->end_date)->endOfDay();
+                $startDate = $request->start_date;
+                $endDate = $request->end_date;
+
+                $startTime = $request->start_time ?? '10:00';
+                $endTime = $request->end_time ?? '22:00';
+
+                $start = Carbon::parse("{$startDate} {$startTime}");
+                $end = Carbon::parse("{$endDate} {$endTime}");
 
                 $histories->whereBetween('created_at', [$start, $end]);
             }
