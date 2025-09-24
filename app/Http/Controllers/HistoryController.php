@@ -32,15 +32,9 @@ class HistoryController extends Controller
                 ])
                 ->where('fk_user_id', $user->user_id);
 
-            if ($request->filled('start_date') && $request->filled('end_date')) {
-                $startDate = $request->start_date;
-                $endDate = $request->end_date;
-
-                $startTime = $request->start_time ?? '10:00';
-                $endTime = $request->end_time ?? '22:00';
-
-                $start = Carbon::parse("{$startDate} {$startTime}");
-                $end = Carbon::parse("{$endDate} {$endTime}");
+            if ($request->filled('start_datetime') && $request->filled('end_datetime')) {
+                $start = Carbon::parse($request->start_datetime);
+                $end   = Carbon::parse($request->end_datetime);
 
                 $histories->whereBetween('created_at', [$start, $end]);
             }
@@ -75,29 +69,45 @@ class HistoryController extends Controller
         $query = Checkout::query()
             ->where('fk_user_id', $user->user_id);
 
-        $start = Carbon::parse($request->start_date)->startOfDay();
-        $end   = Carbon::parse($request->end_date)->endOfDay();
+        $start = Carbon::parse($request->start_datetime);
+        $end   = Carbon::parse($request->end_datetime);
+
         $query->whereBetween('created_at', [$start, $end]);
 
         $histories = $query->orderBy('created_at', 'desc')->get();
 
-        $totalQris   = $histories->where('payment_method', 'qris')->sum('total_price');
-        $jumlahQris  = $histories->where('payment_method', 'qris')->count();
+        $jumlahFoodQris = $histories->where('type', 'food')->where('payment_method', 'qris')
+            ->count();
+        $totalFoodQris  = $histories->where('type', 'food')->where('payment_method', 'qris')
+            ->sum('total_price');
 
-        $totalTunai  = $histories->where('payment_method', 'tunai')->sum('total_price');
-        $jumlahTunai = $histories->where('payment_method', 'tunai')->count();
+        $jumlahFoodTunai = $histories->where('type', 'food')->where('payment_method', 'tunai')
+            ->count();
+        $totalFoodTunai  = $histories->where('type', 'food')->where('payment_method', 'tunai')
+            ->sum('total_price');
 
-        $grandTotal  = $histories->sum('total_price');
+        $jumlahBillingQris = $histories->where('type', 'billing')->where('payment_method', 'qris')
+            ->count();
+        $totalBillingQris  = $histories->where('type', 'billing')->where('payment_method', 'qris')
+            ->sum('total_price');
 
-        $pdf = Pdf::loadView('history.pdf', compact(
+        $jumlahBillingTunai = $histories->where('type', 'billing')->where('payment_method', 'tunai')
+            ->count();
+        $totalBillingTunai  = $histories->where('type', 'billing')->where('payment_method', 'tunai')
+            ->sum('total_price');
+
+        $pdf = Pdf::loadView('history.pdf', compact([
             'histories',
-            'totalQris',
-            'jumlahQris',
-            'totalTunai',
-            'jumlahTunai',
-            'grandTotal',
+            'jumlahFoodQris',
+            'totalFoodQris',
+            'jumlahFoodTunai',
+            'totalFoodTunai',
+            'jumlahBillingQris',
+            'totalBillingQris',
+            'jumlahBillingTunai',
+            'totalBillingTunai',
             'start',
-            'end'
+            'end']
         ))->setPaper('a4', 'landscape');
 
         return $pdf->download("report-{$start->format('Y-m-d')}_to_{$end->format('Y-m-d')}.pdf");

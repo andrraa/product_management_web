@@ -29,8 +29,17 @@
 
 <body>
     <h2>History Report</h2>
-    <p>Period: {{ request('start_date') }} - {{ request('end_date') }}</p>
-
+    <p>
+        Period:
+        @if(request('start_datetime') && request('end_datetime'))
+            {{ \Carbon\Carbon::parse(request('start_datetime'))->format('d/m/Y H:i') }}
+            -
+            {{ \Carbon\Carbon::parse(request('end_datetime'))->format('d/m/Y H:i') }}
+        @else
+            -
+        @endif
+    </p>
+    
     <table>
         <thead>
             <tr>
@@ -63,25 +72,73 @@
     <h3 style="margin-top:20px;">Summary</h3>
     <table>
         <tbody>
+            {{-- Makanan --}}
             <tr>
-                <td>Total QRIS Transactions</td>
-                <td>{{ $jumlahQris }}</td>
+                <th colspan="2">Makanan</th>
             </tr>
             <tr>
-                <td>Total QRIS Payment</td>
-                <td>{{ number_format($totalQris, 0, ',', '.') }}</td>
+                <td>Total Metode QRIS</td>
+                <td>{{ $jumlahFoodQris }}</td>
             </tr>
             <tr>
-                <td>Total TUNAI Transactions</td>
-                <td>{{ $jumlahTunai }}</td>
+                <td>Total Pembayaran QRIS</td>
+                <td>{{ number_format($totalFoodQris, 0, ',', '.') }}</td>
             </tr>
             <tr>
-                <td>Total TUNAI Payment</td>
-                <td>{{ number_format($totalTunai, 0, ',', '.') }}</td>
+                <td>Total Metode Tunai</td>
+                <td>{{ $jumlahFoodTunai }}</td>
             </tr>
             <tr>
-                <th>Grand Total</th>
-                <th>{{ number_format($grandTotal, 0, ',', '.') }}</th>
+                <td>Total Pembayaran Tunai</td>
+                <td>{{ number_format($totalFoodTunai, 0, ',', '.') }}</td>
+            </tr>
+
+            {{-- Billing --}}
+            <tr>
+                <th colspan="2" style="padding-top:10px;">Billing</th>
+            </tr>
+            <tr>
+                <td>Total Metode QRIS</td>
+                <td>{{ $jumlahBillingQris }}</td>
+            </tr>
+            <tr>
+                <td>Total Pembayaran QRIS</td>
+                <td>{{ number_format($totalBillingQris, 0, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td>Total Metode Tunai</td>
+                <td>{{ $jumlahBillingTunai }}</td>
+            </tr>
+            <tr>
+                <td>Total Pembayaran Tunai</td>
+                <td>{{ number_format($totalBillingTunai, 0, ',', '.') }}</td>
+            </tr>
+
+            {{-- Subtotal --}}
+            <tr>
+                <th colspan="2" style="padding-top:10px;">Subtotal</th>
+            </tr>
+            <tr>
+                <td>Subtotal Metode QRIS</td>
+                <td>{{ $jumlahFoodQris + $jumlahBillingQris }}</td>
+            </tr>
+            <tr>
+                <td>Subtotal Pembayaran QRIS</td>
+                <td>{{ number_format($totalFoodQris + $totalBillingQris, 0, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td>Subtotal Metode Tunai</td>
+                <td>{{ $jumlahFoodTunai + $jumlahBillingTunai }}</td>
+            </tr>
+            <tr>
+                <td>Subtotal Pembayaran Tunai</td>
+                <td>{{ number_format($totalFoodTunai + $totalBillingTunai, 0, ',', '.') }}</td>
+            </tr>
+
+            {{-- Grand Total --}}
+            <tr>
+                <th>Total</th>
+                <th>{{ number_format(($totalFoodQris + $totalBillingQris) + ($totalFoodTunai + $totalBillingTunai), 0, ',', '.') }}</th>
             </tr>
         </tbody>
     </table>

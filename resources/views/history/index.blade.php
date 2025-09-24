@@ -104,8 +104,8 @@
                 ajax: {
                     url: "{{ route('history') }}",
                     data: function (d) {
-                        d.start_date = $('#start_date').val();
-                        d.end_date   = $('#end_date').val();
+                        d.start_datetime = $('#start_datetime').val();
+                        d.end_datetime   = $('#end_datetime').val();
                     },
                     dataSrc: function (json) {
                         $('.qris-total').text(
@@ -174,8 +174,8 @@
             });
 
             $('#export-pdf').on('click', function() {
-                let start = $('#start_date').val();
-                let end   = $('#end_date').val();
+                let start = $('#start_datetime').val();
+                let end   = $('#end_datetime').val();
 
                 $.ajax({
                     url: "{{ route('history.export') }}",
