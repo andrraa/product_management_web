@@ -5,6 +5,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -36,4 +37,7 @@ Route::middleware('auth')->group(function() {
 
     Route::get('history', [HistoryController::class, 'index'])->name('history');
     Route::post('history/pdf', [HistoryController::class, 'export'])->name('history.export');
+
+    Route::resource('profile', ProfileController::class)->only(['index', 'store']);
+    Route::post('profile/password', [ProfileController::class, 'password'])->name('profile.password');
 });

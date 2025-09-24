@@ -21,6 +21,8 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
+    <link rel="icon" href="{{ Vite::asset('resources/assets/favicon.png') }}">
+
     @vite('resources/css/app.css')
     
     @stack('styles')

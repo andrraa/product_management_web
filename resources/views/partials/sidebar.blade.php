@@ -11,6 +11,8 @@
 
         <x-sidebar-item route="{{ route('history') }}" pattern="history" icon="fa-dollar" label="History" />
 
+        <x-sidebar-item route="{{ route('profile.index') }}" pattern="profile.*" icon="fa-id-card" label="Profile" />
+
         @if ($authUser->role === \App\Models\User::ROLE_ADMIN)
             <x-sidebar-item route="{{ route('user.index') }}" pattern="user.*" icon="fa-user" label="User" />
         @endif
