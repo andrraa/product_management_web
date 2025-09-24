@@ -2,6 +2,29 @@
 
 @section('title', 'Overview')
 
+@push('styles')
+    <style>
+        .swal2-radio label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.6rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .swal2-radio label:hover {
+            background-color: #f3f4f6;
+        }
+
+        .swal2-radio input[type="radio"] {
+            accent-color: #16a34a;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="mb-4">
         <span class="text-lg font-bold tracking-wide text-green-600 dark:text-gray-200">Dashboard</span>
@@ -46,10 +69,12 @@
 
         {{-- CASHIER --}}
          <div id="cashier" class="bg-white dark:bg-gray-700 rounded-md p-4 flex flex-col h-full">
-            <div id="cart-items" class="flex-1 overflow-y-auto space-y-2 max-h-56 pr-1">
+            <!-- Cart Items -->
+            <div id="cart-items" class="flex-1 overflow-y-auto space-y-2 max-h-72 pr-1">
             </div>
 
-            <div class="mt-4 border-t border-gray-200 dark:border-gray-600 pt-4 space-y-3">
+            <!-- Footer -->
+            <div class="mt-auto border-t border-gray-200 dark:border-gray-600 pt-4 space-y-3">
                 <div class="flex justify-between text-sm">
                     <span class="text-gray-700 dark:text-gray-200">Total:</span>
                     <span id="cart-total" class="font-semibold text-gray-900 dark:text-gray-100">Rp 0</span>
@@ -66,20 +91,6 @@
                 <div class="flex justify-between text-sm">
                     <span class="text-gray-700 dark:text-gray-200">Kembalian:</span>
                     <span id="cart-change" class="font-semibold text-gray-900 dark:text-gray-100">Rp 0</span>
-                </div>
-
-                <div>
-                    <span class="block text-sm text-gray-700 dark:text-gray-200 mb-1">Metode Pembayaran</span>
-                    <div class="flex gap-3">
-                        <label class="flex items-center gap-1 text-sm cursor-pointer">
-                            <input checked type="radio" name="payment" value="tunai" class="text-green-600 focus:ring-green-500">
-                            <span class="text-gray-700 dark:text-gray-200">Tunai</span>
-                        </label>
-                        <label class="flex items-center gap-1 text-sm cursor-pointer">
-                            <input type="radio" name="payment" value="qris" class="text-green-600 focus:ring-green-500">
-                            <span class="text-gray-700 dark:text-gray-200">QRIS</span>
-                        </label>
-                    </div>
                 </div>
 
                 <button id="checkout-btn" 
@@ -231,17 +242,11 @@
             });
 
             $('#checkout-btn').on('click', function () {
-                let payment = $('input[name="payment"]:checked').val();
                 let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                 let uang    = parseInt($('#uang-diterima').val()) || 0;
 
                 if (cart.length < 1) {
                     Swal.fire("Oops!", "Keranjang kosong.", "error");
-                    return;
-                }
-
-                if (!payment) {
-                    alert('Pilih metode pembayaran!');
                     return;
                 }
 
@@ -255,24 +260,48 @@
                     return;
                 }
 
-                $.ajax({
-                    url: "{{ route('checkout') }}",
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        cart: cart,
-                        payment: payment,
+                Swal.fire({
+                    title: "Pilih Metode Pembayaran",
+                    input: 'radio',
+                    inputOptions: {
+                        tunai: 'Tunai',
+                        qris: 'QRIS'
                     },
-                    success: function (res) {
-                        Swal.fire("Success", "Checkout Success.", "success");
-                        cart = [];
-                        renderCart();
-                        fetchProducts();
-                        $('#uang-diterima').val(0);
-                        updateChange();
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'Pilih salah satu metode pembayaran!';
+                        }
                     },
-                    error: function () {
-                        Swal.fire("Failed", "Failed to checkout.", "error");
+                    showCancelButton: true,
+                    confirmButtonText: 'Lanjutkan',
+                    cancelButtonText: 'Batal',
+                    preConfirm: (payment) => {
+                        return payment;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let payment = result.value;
+
+                        $.ajax({
+                            url: "{{ route('checkout') }}",
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                cart: cart,
+                                payment: payment,
+                            },
+                            success: function (res) {
+                                Swal.fire("Success", "Checkout Success.", "success");
+                                cart = [];
+                                renderCart();
+                                fetchProducts();
+                                $('#uang-diterima').val(0);
+                                updateChange();
+                            },
+                            error: function () {
+                                Swal.fire("Failed", "Failed to checkout.", "error");
+                            }
+                        });
                     }
                 });
             });
