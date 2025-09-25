@@ -30,13 +30,20 @@
 <body>
     <h2>History Report</h2>
     <p>
+        User: <strong>{{ $authUser->name }}</strong><br>
         Period:
         @if(request('start_datetime') && request('end_datetime'))
-            {{ \Carbon\Carbon::parse(request('start_datetime'))->format('d/m/Y H:i') }}
-            -
-            {{ \Carbon\Carbon::parse(request('end_datetime'))->format('d/m/Y H:i') }}
+            @php
+                $start = \Carbon\Carbon::parse(request('start_datetime'));
+                $end = \Carbon\Carbon::parse(request('end_datetime'));
+
+                $shift = ($start->format('H') >= 10 && $end->format('H') <= 22) ? 'Morning' : 'Night';
+            @endphp
+
+            {{ $start->format('d/m/Y H:i') }} - {{ $end->format('d/m/Y H:i') }}<br>
+            Shift: <strong>{{ $shift }}</strong>
         @else
-            -
+            - 
         @endif
     </p>
     

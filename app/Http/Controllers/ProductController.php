@@ -35,9 +35,15 @@ class ProductController extends Controller
                 ->addColumn('actions', function($product) use ($user) {
                     $actions = [];
 
+                    if (
+                        ($user->role === User::ROLE_EMPLOYEE && $product->type == Product::TYPE_FOOD) ||
+                        $user->role === User::ROLE_ADMIN
+                    ) {
+                        $actions['edit'] = route('product.edit', $product->product_id);
+                    }
+
                     if ($user->role === User::ROLE_ADMIN) {
                         $actions['delete'] = route('product.destroy', $product->product_id);
-                        $actions['edit'] = route('product.edit', $product->product_id);
                     }
 
                     return $actions;
@@ -75,8 +81,9 @@ class ProductController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->role !== User::ROLE_ADMIN) {
-            return to_route('product.index');
+        if ($user->role === User::ROLE_EMPLOYEE && $product->type !== Product::TYPE_FOOD) {
+            return to_route('product.index')
+                ->with('error', 'Anda tidak memiliki akses untuk mengedit produk ini.');
         }
 
         $validator = Helper::generateValidator(ProductRequest::class, '#form-product');
@@ -88,8 +95,9 @@ class ProductController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->role !== User::ROLE_ADMIN) {
-            return to_route('product.index');
+        if ($user->role === User::ROLE_EMPLOYEE && $product->type !== Product::TYPE_FOOD) {
+            return to_route('product.index')
+                ->with('error', 'Anda tidak memiliki akses untuk mengedit produk ini.');
         }
 
         $validated = $request->validated();

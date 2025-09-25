@@ -19,7 +19,7 @@ class HistoryController extends Controller
         if ($request->ajax()) {
             $user = Auth::user();
 
-            $histories = Checkout::query()
+            $histories = Checkout::with(['user'])
                 ->select([
                     'name',
                     'quantity',
@@ -33,8 +33,8 @@ class HistoryController extends Controller
                 ->where('fk_user_id', $user->user_id);
 
             if ($request->filled('start_datetime') && $request->filled('end_datetime')) {
-                $start = Carbon::parse($request->start_datetime);
-                $end   = Carbon::parse($request->end_datetime);
+                $start = Carbon::parse($request->start_datetime, 'Asia/Makassar')->timezone('UTC');
+                $end   = Carbon::parse($request->end_datetime, 'Asia/Makassar')->timezone('UTC');
 
                 $histories->whereBetween('created_at', [$start, $end]);
             }
@@ -69,8 +69,8 @@ class HistoryController extends Controller
         $query = Checkout::query()
             ->where('fk_user_id', $user->user_id);
 
-        $start = Carbon::parse($request->start_datetime);
-        $end   = Carbon::parse($request->end_datetime);
+        $start = Carbon::parse($request->start_datetime, 'Asia/Makassar')->timezone('UTC');
+        $end   = Carbon::parse($request->end_datetime, 'Asia/Makassar')->timezone('UTC');
 
         $query->whereBetween('created_at', [$start, $end]);
 

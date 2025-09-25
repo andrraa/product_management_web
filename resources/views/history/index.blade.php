@@ -16,7 +16,7 @@
             <label for="start_datetime" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 Start Date & Time
             </label>
-            <input type="datetime-local" id="start_datetime" 
+            <input type="datetime-local" id="start_datetime" name="start_datetime"
                 class="mt-1 w-full md:w-60 px-2 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 
                     bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm
                     focus:outline-none focus:ring focus:ring-green-500 focus:border-green-500"
@@ -27,7 +27,7 @@
             <label for="end_datetime" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 End Date & Time
             </label>
-            <input type="datetime-local" id="end_datetime" 
+            <input type="datetime-local" id="end_datetime" name="end_datetime"
                 class="mt-1 w-full md:w-60 px-2 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 
                     bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm
                     focus:outline-none focus:ring focus:ring-green-500 focus:border-green-500"
@@ -82,6 +82,7 @@
                     <th>Payment</th>
                     <th>Price</th>
                     <th>Total</th>
+                    <th>By</th>
                     <th>Date</th>
                 </tr>
             </thead>
@@ -147,6 +148,7 @@
                             ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(data) 
                             : data
                     },
+                    { data: 'user.username', name: 'user.username' },
                     { 
                         data: 'created_at', 
                         name: 'created_at',
@@ -181,8 +183,8 @@
                     url: "{{ route('history.export') }}",
                     type: "POST",
                     data: {
-                        start_date: start,
-                        end_date: end,
+                        start_datetime: start,
+                        end_datetime: end,
                         _token: "{{ csrf_token() }}"
                     },
                     xhrFields: {

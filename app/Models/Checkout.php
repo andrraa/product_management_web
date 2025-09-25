@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Checkout extends Model
 {
@@ -17,4 +18,9 @@ class Checkout extends Model
         'total_price',
         'fk_user_id'
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'fk_user_id', 'user_id');
+    }
 }

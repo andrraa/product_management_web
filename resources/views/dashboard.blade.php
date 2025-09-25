@@ -80,19 +80,6 @@
                     <span id="cart-total" class="font-semibold text-gray-900 dark:text-gray-100">Rp 0</span>
                 </div>
 
-                <div>
-                    <label class="block text-sm text-gray-700 dark:text-gray-200 mb-1">Uang Diterima</label>
-                    <input type="number" id="uang-diterima" placeholder="0"
-                        class="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 
-                            bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm
-                            focus:outline-none focus:ring focus:ring-green-500 focus:border-green-500">
-                </div>
-
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-700 dark:text-gray-200">Kembalian:</span>
-                    <span id="cart-change" class="font-semibold text-gray-900 dark:text-gray-100">Rp 0</span>
-                </div>
-
                 <button id="checkout-btn" 
                     class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-md">
                     Checkout
@@ -183,17 +170,6 @@
 
                 $('#cart-items').html(html || '<p class="text-sm text-gray-500">Keranjang kosong.</p>');
                 $('#cart-total').text(`Rp ${total.toLocaleString()}`);
-                updateChange();
-            }
-
-            function updateChange() {
-                let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                let received = parseInt($('#uang-diterima').val()) || 0;
-                let change = received - total;
-
-                if (change < 0) change = 0;
-
-                $('#cart-change').text(`Rp ${change.toLocaleString('id-ID')}`);
             }
 
             fetchProducts();
@@ -243,20 +219,9 @@
 
             $('#checkout-btn').on('click', function () {
                 let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                let uang    = parseInt($('#uang-diterima').val()) || 0;
 
                 if (cart.length < 1) {
                     Swal.fire("Oops!", "Keranjang kosong.", "error");
-                    return;
-                }
-
-                if (uang <= 0) {
-                    Swal.fire("Oops!", "Masukkan jumlah uang yang diterima.", "error");
-                    return;
-                }
-
-                if (uang < total) {
-                    Swal.fire("Oops!", "Uang diterima kurang dari total belanja.", "error");
                     return;
                 }
 
@@ -295,8 +260,6 @@
                                 cart = [];
                                 renderCart();
                                 fetchProducts();
-                                $('#uang-diterima').val(0);
-                                updateChange();
                             },
                             error: function () {
                                 Swal.fire("Failed", "Failed to checkout.", "error");
@@ -304,10 +267,6 @@
                         });
                     }
                 });
-            });
-
-            $(document).on('input', '#uang-diterima', function () {
-                updateChange();
             });
         });
     </script>

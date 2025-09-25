@@ -6,6 +6,17 @@
             <i class="fa-solid fa-user text-white text-[12px]"></i>
         </div>
 
-        <span class="font-medium text-green-600 dark:text-gray-200 text-sm tracking-wide md:block hidden">{{ $authUser->name }}</span>
+        <div class="flex flex-col">
+            <span class="font-medium text-green-600 dark:text-gray-200 text-sm tracking-wide md:block hidden">
+                {{ $authUser->name }}
+            </span>
+            <span class="font-medium text-green-600 dark:text-gray-200 text-[10px] tracking-wide md:block hidden capitalize">
+                @if ($authUser->shift)
+                    Shift: {{ $authUser->shift }}
+                @else
+                    Shift: -
+                @endif
+            </span>
+        </div>
     </div>
 </nav>
