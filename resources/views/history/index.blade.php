@@ -12,15 +12,29 @@
     </div>
 
     <div class="mb-4 flex flex-col md:flex-row md:items-end md:space-x-3 space-y-2 md:space-y-0">
+        @php
+            $now = now();
+            $start = null;
+            $end = null;
+
+            if ($now->hour >= 10 && $now->hour < 22) {
+                $start = $now->copy()->setTime(10, 0);
+                $end = $now->copy()->setTime(22, 0);
+            } else {
+                $start = $now->copy()->setTime(22, 0);
+                $end = $now->copy()->addDay()->setTime(10, 0);
+            }
+
+            $startValue = $start->format('Y-m-d\TH:i');
+            $endValue = $end->format('Y-m-d\TH:i');
+        @endphp
         <div>
             <label for="start_datetime" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 Start Date & Time
             </label>
             <input type="datetime-local" id="start_datetime" name="start_datetime"
-                class="mt-1 w-full md:w-60 px-2 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 
-                    bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm
-                    focus:outline-none focus:ring focus:ring-green-500 focus:border-green-500"
-                value="{{ date('Y-m-d') }}T10:00">
+                class="mt-1 w-full md:w-60 px-2 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm focus:outline-none focus:ring focus:ring-green-500 focus:border-green-500"
+                value="{{ $startValue }}">
         </div>
 
         <div>
@@ -28,21 +42,19 @@
                 End Date & Time
             </label>
             <input type="datetime-local" id="end_datetime" name="end_datetime"
-                class="mt-1 w-full md:w-60 px-2 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 
-                    bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm
-                    focus:outline-none focus:ring focus:ring-green-500 focus:border-green-500"
-                value="{{ date('Y-m-d') }}T22:00">
+                class="mt-1 w-full md:w-60 px-2 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm focus:outline-none focus:ring focus:ring-green-500 focus:border-green-500"
+                value="{{ $endValue }}">
         </div>
 
         <div>
-            <button id="filter-btn" 
+            <button id="filter-btn"
                 class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-semibold">
                 Filter
             </button>
         </div>
 
         <div>
-            <button id="export-pdf" 
+            <button id="export-pdf"
                 class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-semibold">
                 Export PDF
             </button>
@@ -95,7 +107,7 @@
     <script type="module" src="https://cdn.datatables.net/2.3.4/js/dataTables.tailwindcss.js"></script>
 
     <script type="module">
-        $(document).ready(function() {
+        $(document).ready(function () {
             let table = $('#table-history').DataTable({
                 responsive: true,
                 processing: true,
@@ -106,7 +118,7 @@
                     url: "{{ route('history') }}",
                     data: function (d) {
                         d.start_datetime = $('#start_datetime').val();
-                        d.end_datetime   = $('#end_datetime').val();
+                        d.end_datetime = $('#end_datetime').val();
                     },
                     dataSrc: function (json) {
                         $('.qris-total').text(
@@ -125,32 +137,38 @@
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                     { data: 'name', name: 'name' },
-                    { data: 'type', name: 'type', render: function (data) {
-                        let typeClass = data === 'food' 
-                            ? 'text-indigo-600 dark:text-indigo-300' 
-                            : 'text-purple-600 dark:text-purple-300';
-                        return `<span class="inline-block px-2 py-1 text-xs font-bold tracking-wider uppercase rounded-lg ${typeClass}">${data ?? ''}</span>`;
-                    }},
-                    { data: 'quantity', name: 'quantity' },
-                    { data: 'payment_method', name: 'payment_method', render: function (data) {
-                        let paymentClass = data === 'tunai' 
-                            ? 'text-blue-600 dark:text-blue-300' 
-                            : 'text-red-600 dark:text-red-300';
-                        return `<span class="inline-block px-2 py-1 text-xs font-bold tracking-wider uppercase rounded-lg ${paymentClass}">${data ?? ''}</span>`;
-                    }},
-                    { data: 'price', name: 'price', render: (data, type) =>
-                        (type === 'display' || type === 'filter') 
-                            ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(data) 
-                            : data
+                    {
+                        data: 'type', name: 'type', render: function (data) {
+                            let typeClass = data === 'food'
+                                ? 'text-indigo-600 dark:text-indigo-300'
+                                : 'text-purple-600 dark:text-purple-300';
+                            return `<span class="inline-block px-2 py-1 text-xs font-bold tracking-wider uppercase rounded-lg ${typeClass}">${data ?? ''}</span>`;
+                        }
                     },
-                    { data: 'total_price', name: 'total_price', render: (data, type) =>
-                        (type === 'display' || type === 'filter') 
-                            ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(data) 
-                            : data
+                    { data: 'quantity', name: 'quantity' },
+                    {
+                        data: 'payment_method', name: 'payment_method', render: function (data) {
+                            let paymentClass = data === 'tunai'
+                                ? 'text-blue-600 dark:text-blue-300'
+                                : 'text-red-600 dark:text-red-300';
+                            return `<span class="inline-block px-2 py-1 text-xs font-bold tracking-wider uppercase rounded-lg ${paymentClass}">${data ?? ''}</span>`;
+                        }
+                    },
+                    {
+                        data: 'price', name: 'price', render: (data, type) =>
+                            (type === 'display' || type === 'filter')
+                                ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(data)
+                                : data
+                    },
+                    {
+                        data: 'total_price', name: 'total_price', render: (data, type) =>
+                            (type === 'display' || type === 'filter')
+                                ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(data)
+                                : data
                     },
                     { data: 'user.username', name: 'user.username' },
-                    { 
-                        data: 'created_at', 
+                    {
+                        data: 'created_at',
                         name: 'created_at',
                         render: function (data, type) {
                             if (type === 'display' || type === 'filter') {
@@ -171,13 +189,13 @@
             });
 
             // tombol filter
-            $('#filter-btn').on('click', function() {
+            $('#filter-btn').on('click', function () {
                 table.ajax.reload();
             });
 
-            $('#export-pdf').on('click', function() {
+            $('#export-pdf').on('click', function () {
                 let start = $('#start_datetime').val();
-                let end   = $('#end_datetime').val();
+                let end = $('#end_datetime').val();
 
                 $.ajax({
                     url: "{{ route('history.export') }}",
@@ -195,7 +213,7 @@
                         let url = window.URL.createObjectURL(blob);
                         window.open(url, "_blank");
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         Swal.fire("Error", "Gagal export PDF", "error");
                     }
                 });

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HistoryController;
@@ -10,24 +11,24 @@ use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('guest')->group(function() {
-    Route::controller(AuthController::class)->group(function() {
+Route::middleware('guest')->group(function () {
+    Route::controller(AuthController::class)->group(function () {
         Route::get('login', 'index');
         Route::post('login', 'login')->name('login');
     });
 });
 
-Route::middleware('auth')->group(function() {
+Route::middleware('auth')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
 
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::resource('product', ProductController::class)->except('show');
 
-    Route::middleware(AdminMiddleware::class)->group(function() {
+    Route::middleware(AdminMiddleware::class)->group(function () {
         Route::resource('user', UserController::class);
-        
-        Route::controller(UserController::class)->group(function() {
+
+        Route::controller(UserController::class)->group(function () {
             Route::get('user/password/{user}/edit', 'editPassword')->name('user.edit.password');
             Route::put('user/password/{user}', 'updatePassword')->name('user.update.password');
         });
@@ -40,4 +41,6 @@ Route::middleware('auth')->group(function() {
 
     Route::resource('profile', ProfileController::class)->only(['index', 'store']);
     Route::post('profile/password', [ProfileController::class, 'password'])->name('profile.password');
+
+    Route::resource('booking', BookingController::class)->only(['index', 'store', 'update', 'destroy']);
 });
