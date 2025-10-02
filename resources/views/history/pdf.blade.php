@@ -31,7 +31,6 @@
     <h2>History Report</h2>
     <p>
         User: <strong>{{ $authUser->name }}</strong><br>
-        Period:
         @if(request('start_datetime') && request('end_datetime'))
             @php
                 $start = \Carbon\Carbon::parse(request('start_datetime'));
@@ -40,13 +39,15 @@
                 $shift = ($start->format('H') >= 10 && $end->format('H') <= 22) ? 'Morning' : 'Night';
             @endphp
 
-            {{ $start->format('d/m/Y H:i') }} - {{ $end->format('d/m/Y H:i') }}<br>
-            Shift: <strong>{{ $shift }}</strong>
+            <span style="margin-top: 5px; display: block;">
+                Period: {{ $start->format('d/m/Y H:i') }} - {{ $end->format('d/m/Y H:i') }}
+            </span>
+            <span style="margin-top: 5px; display: block;">Shift: <strong>{{ $shift }}</strong></span>
         @else
-            - 
+            Period: -
         @endif
     </p>
-    
+
     <table>
         <thead>
             <tr>
@@ -70,7 +71,7 @@
                     <td>{{ strtoupper($row->payment_method) }}</td>
                     <td>{{ number_format($row->price, 0, ',', '.') }}</td>
                     <td>{{ number_format($row->total_price, 0, ',', '.') }}</td>
-                    <td>{{ $row->created_at->timezone('Asia/Makassar')->format('d/m/Y H:i') }}</td>
+                    <td>{{ $row->created_at->timezone('Asia/Makassar')->format('d/m/Y H:i') }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -145,7 +146,8 @@
             {{-- Grand Total --}}
             <tr>
                 <th>Total</th>
-                <th>{{ number_format(($totalFoodQris + $totalBillingQris) + ($totalFoodTunai + $totalBillingTunai), 0, ',', '.') }}</th>
+                <th>{{ number_format(($totalFoodQris + $totalBillingQris) + ($totalFoodTunai + $totalBillingTunai), 0, ',', '.') }}
+                </th>
             </tr>
         </tbody>
     </table>
