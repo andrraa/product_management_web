@@ -17,12 +17,14 @@
             $start = null;
             $end = null;
 
-            if ($now->hour >= 10 && $now->hour < 22) {
-                $start = $now->copy()->setTime(10, 0);
-                $end = $now->copy()->setTime(22, 0);
+            if ($now->hour >= 12 && $now->hour < 24) {
+                // Interval siang: 12:00 → 00:00
+                $start = $now->copy()->setTime(12, 0);
+                $end = $now->copy()->setTime(0, 0)->addDay(); 
             } else {
-                $start = $now->copy()->setTime(22, 0);
-                $end = $now->copy()->addDay()->setTime(10, 0);
+                // Interval malam: 00:00 → 12:00
+                $start = $now->copy()->setTime(0, 0);
+                $end = $now->copy()->setTime(12, 0);
             }
 
             $startValue = $start->format('Y-m-d\TH:i');
