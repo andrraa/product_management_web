@@ -42,6 +42,10 @@ class ProductController extends Controller
                         $actions['edit'] = route('product.edit', $product->product_id);
                     }
 
+                    if ($user->role === User::ROLE_EMPLOYEE && $product->type == Product::TYPE_FOOD) {
+                        $actions['add'] = $product->product_id;
+                    }
+
                     if ($user->role === User::ROLE_ADMIN) {
                         $actions['delete'] = route('product.destroy', $product->product_id);
                     }
@@ -118,5 +122,25 @@ class ProductController extends Controller
         $product->delete();
 
         return response()->json(['success' => true]);
+    }
+
+    public function addStock(Request $request): JsonResponse
+    {
+        $id = $request->input('stock_id');
+        $stock = (int) $request->input('stock');
+
+        $product = Product::firstWhere('product_id', $id);
+
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Product tidak ditemukan'], 404);
+        }
+
+        $newStock = $product->stock + $stock;
+
+        $product->update([
+            'stock' => $newStock,
+        ]);
+
+        return response()->json(['success' => true, 'stock' => $newStock]);
     }
 }

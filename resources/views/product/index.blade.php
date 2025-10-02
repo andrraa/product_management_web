@@ -131,6 +131,14 @@
                         render: function (data, type, row) {
                         let buttons = '';
 
+                        if (data.add) {
+                            buttons += `
+                                <button type="button" data-stock-id="${data.add}" class="stock-button">
+                                    <i class="fa-solid fa-plus-minus text-xs text-yellow-600 dark:text-yellow-400"></i>
+                                </button>
+                            `;
+                        }
+
                         if (data.edit) {
                             buttons += `
                                 <a href="${data.edit}" type="button">
@@ -152,6 +160,58 @@
                     }
                     }
                 ]
+            });
+
+            $(document).on("click", ".stock-button", function () {
+                let productId = $(this).data("stock-id");
+
+                Swal.fire({
+                    title: 'Tambah Stock',
+                    html: `
+                        <form id="form-add-stock">
+                            <input type="number" id="newStock" class="swal2-input" placeholder="Jumlah stock" min="1">
+                        </form>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Tambah',
+                    cancelButtonText: 'Batal',
+                    preConfirm: () => {
+                        let value = $('#newStock').val();
+                        if (!value || value <= 0) {
+                            Swal.showValidationMessage('Jumlah stock wajib diisi');
+                            return false;
+                        }
+                        return value;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('product.add.stock') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                stock_id: productId,
+                                stock: result.value
+                            },
+                            success: function (res) {
+                                if (res.success === true) {
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Berhasil",
+                                        text: "Stock berhasil ditambahkan!"
+                                    }).then(() => {
+                                        $('#table-product').DataTable().ajax.reload(null, false); 
+                                    });
+                                } else {
+                                    Swal.fire("Gagal", "Terjadi error saat update stock", "error");
+                                }
+                            },
+                            error: function () {
+                                Swal.fire("Gagal", "Tidak bisa terhubung ke server", "error");
+                            }
+                        });
+                    }
+                });
             });
         });
     </script>

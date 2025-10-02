@@ -30,5 +30,16 @@
 
         initInputNumberFormatter();
         initInputCurrencyFormatter();
+
+        let stockInput = $('#stock');
+        let originalStock = stockInput.val();
+
+        let userRole = "{{ $authUser->role }}";
+
+        $("#form-product").on("submit", function () {
+            if (userRole === "employee") {
+                stockInput.val(originalStock);
+            }
+        });
     </script>
 @endpush

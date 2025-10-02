@@ -24,6 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::resource('product', ProductController::class)->except('show');
+    Route::post('product/add-stock', [ProductController::class, 'addStock'])->name('product.add.stock');
 
     Route::middleware(AdminMiddleware::class)->group(function () {
         Route::resource('user', UserController::class);
