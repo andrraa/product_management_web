@@ -70,7 +70,7 @@
                     <td>{{ strtoupper($row->payment_method) }}</td>
                     <td>{{ number_format($row->price, 0, ',', '.') }}</td>
                     <td>{{ number_format($row->total_price, 0, ',', '.') }}</td>
-                    <td>{{ $row->created_at->format('d/m/Y H:i') }}</td>
+                    <td>{{ $row->created_at->timezone('Asia/Makassar')->format('d/m/Y H:i') }}</td>
                 </tr>
             @endforeach
         </tbody>
